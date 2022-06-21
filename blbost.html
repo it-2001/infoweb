@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById("canvas")
+    const c = canvas.getContext("2d")
+    const FRICTION = -0.4
+    const POWER_LOSS = 0.95
+    const ELASTICITY = 0.4
+    const G = 0.08
+    const AIR_RESISTANCE = 0.99
+    class Bubble {
+        constructor(x, y, r) {
+            this.x = x
+            this.y = y
+            this.r = r
+            this.xs = Math.random() * 2 - 1
+            this.ys = Math.random() * 2 - 1
+        }
+        move() {
+            this.collision()
+            this.gravity()
+            this.xs *= AIR_RESISTANCE
+            this.ys *= AIR_RESISTANCE
+            this.x += this.xs
+            this.y += this.ys
+            if (this.x - this.r < 0) {
+                this.xs *= FRICTION
+                this.ys *= POWER_LOSS
+                this.x = this.r
+            }
+            if (this.x + this.r > 800) {
+                this.xs *= FRICTION
+                this.ys *= POWER_LOSS
+                this.x = 800 - this.r
+            }
+            if (this.y - this.r < 0) {
+                this.ys *= FRICTION
+                this.xs *= POWER_LOSS
+                this.y = this.r
+            }
+            if (this.y + this.r > 800) {
+                this.ys *= FRICTION
+                this.xs *= POWER_LOSS
+                this.y = 800 - this.r
+            }
+        }
+        collision() {
+            for (let i in bubbles) {
+                if (bubbles[i] != this) {
+                    const bub = bubbles[i]
+                    const dist = distance(this, bub)
+                    if (dist.c > this.r + bub.r) continue
+                    this.xs -= dist.fx * (bub.r / this.r) * ELASTICITY
+                    this.ys -= dist.fy * (bub.r / this.r) * ELASTICITY
+                }
+            }
+        }
+        draw() {
+            c.fillStyle = "red"
+            c.beginPath()
+            c.arc(this.x, this.y, this.r, Math.PI * 2, 0)
+            c.fill()
+        }
+        gravity(){
+            this.ys += G
+        }
+    }
+
+    function distance(p1, p2) {
+        const a = p2.x - p1.x
+        const b = p2.y - p1.y
+        if (a == 0 && b == 0)
+            return {
+                x: 0,
+                y: 0,
+                c: 0,
+                fx: 0,
+                fy: 0
+            }
+        const c = Math.sqrt(a * a + b * b)
+        return {
+            x: a,
+            y: b,
+            c,
+            fx: a / c,
+            fy: b / c
+        }
+    }
+    let bubbles = []
+    for (let i = 0; i < 15; i++)
+        for (let j = 0; j < 4; j++)
+            bubbles.push(new Bubble(800 / 15 * i + 800 / 30, 800 / 8 * j + 800 / 16, Math.random() * 5 + 10))
+
+    function main() {
+        c.fillStyle = "black"
+        c.fillRect(0, 0, 800, 800)
+        for (let i in bubbles) {
+            bubbles[i].move()
+            bubbles[i].draw()
+        }
+        requestAnimationFrame(main)
+    }
+    main()
+</script>
+
+</html>

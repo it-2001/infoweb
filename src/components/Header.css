@@ -1,0 +1,21 @@
+header {
+    height: 140px;
+}
+header>div{
+    top: 140px;
+    left: 0px;
+    height:max-content;
+    position: absolute;
+}
+.p-5 {
+    padding: 1px !important;
+    padding-left: 15px !important;
+}
+code{
+    font-family:'Courier New', Courier, monospace;
+    
+}
+pre{
+    background-color: rgb(233, 233, 233);
+    padding-left: 10px;
+}
